@@ -9,7 +9,7 @@
 html,body{margin:0;min-height:100%;background:#fff5f7;color:#7a3340;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
 main{min-height:100vh;display:flex;justify-content:center;align-items:flex-start}
 #status{padding:32px 18px;text-align:center;font-size:16px}
-#poster{display:block;width:100%;max-width:720px;height:auto;margin:0 auto}
+#poster{display:block;width:100%;max-width:720px;height:auto;margin:0 auto;image-rendering:auto}
 </style>
 </head>
 <body>
@@ -18,21 +18,19 @@ main{min-height:100vh;display:flex;justify-content:center;align-items:flex-start
   <img id="poster" alt="小猪见面会海报" hidden>
 </main>
 <script>
-(async()=>{
-  const files=Array.from({length:9},(_,i)=>`data/p${i}.txt`);
+(()=>{
   const status=document.getElementById('status');
+  const img=document.getElementById('poster');
   try{
-    const parts=await Promise.all(files.map(async u=>{
-      const r=await fetch(u,{cache:'force-cache'});
-      if(!r.ok) throw new Error(`HTTP ${r.status}`);
-      return (await r.text()).trim();
-    }));
-    const img=document.getElementById('poster');
+    let s=location.hash.slice(1);
+    if(!s) throw new Error('missing poster data');
+    s=s.replace(/-/g,'+').replace(/_/g,'/');
+    while(s.length%4) s+='=';
     img.onload=()=>{status.remove();img.hidden=false;};
-    img.onerror=()=>{status.textContent='海报加载失败，请刷新重试。';};
-    img.src='data:image/jpeg;base64,'+parts.join('');
+    img.onerror=()=>{status.textContent='海报加载失败，请重新扫码。';};
+    img.src='data:image/jpeg;base64,'+s;
   }catch(e){
-    status.textContent='海报加载失败，请刷新重试。';
+    status.textContent='请使用活动二维码打开本页。';
   }
 })();
 </script>
